@@ -5,20 +5,29 @@
 
 
 bind(Data) ->
-    BaseRe = <<":\s+(.*)\n">>,
-    Fun = fun({Key, Patterns}, Acc) ->
-                  lists:map(fun(Pattern) ->
-                                    P = iolist_to_binary([Pattern, BaseRe]),
-                                    ReOpts = [{capture, [1], binary}],
-                                    case re:run(Data, P, ReOpts) of
-                                        {match, [Value]} ->
-                                            [{Key, Value}] ++ [Acc];
-                                        nomatch ->
-                                            Acc
-                                    end
-                            end, Patterns)
-          end,
-    lists:flatten(lists:foldl(Fun, [], bind_patterns())).
+    bind(Data, bind_patterns(), []).
+
+bind(_Data, [], Acc) ->
+    Acc;
+bind(Data, [{K, Patterns} | Tail], Acc) ->
+    Acc2 = case match_value(Data, Patterns) of
+               undefined ->
+                   Acc;
+               V ->
+                   [{K, V} | Acc]
+           end,
+    bind(Data, Tail, Acc2).
+
+
+match_value(_Data, []) ->
+    undefined;
+match_value(Data, [Pattern | Tail]) ->
+    case re:run(Data, iolist_to_binary([Pattern, <<":\s+(.*)\n">>]), [{capture, [1], binary}]) of
+        {match, [Value]} ->
+            trimre(Value);
+        nomatch ->
+            match_value(Data, Tail)
+    end.
 
 
 parse_vals(Data) ->
@@ -42,7 +51,7 @@ bind_patterns() ->
     [
      {status, [<<"state">>, <<"Status">>]},
      {creation_date, [<<"created">>, <<"Creation Date">>, <<"Creation date">>, <<"Registration Date">>,
-                      <<"created">>, <<"created-date">>, <<"registered">>, <<"registration">>]},
+                      <<"created-date">>, <<"registered">>, <<"registration">>]},
      {expiration_date, [<<"paid-till">>]},
      {registrar, [<<"registrar">>, <<"Registrar">>]},
      {whois_server, [<<"Whois Server">>]},
