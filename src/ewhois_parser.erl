@@ -12,7 +12,7 @@ bind(Data) ->
                                     ReOpts = [{capture, [1], binary}],
                                     case re:run(Data, P, ReOpts) of
                                         {match, [Value]} ->
-                                            [{Key, Value} | Acc];
+                                            [{Key, Value}] ++ [Acc];
                                         nomatch ->
                                             Acc
                                     end
@@ -24,14 +24,18 @@ bind(Data) ->
 parse_vals(Data) ->
     Lines = binary:split(Data, <<"\n">>, [global]),
     Fun = fun(Line) ->
-                  case re:run(Line, <<"\s+(.*):\s+(.*)">>, [{capture, [1,2], binary}]) of
+                  case re:run(Line, <<"(.*):\s+(.*)">>, [{capture, [1,2], binary}]) of
                       {match, [K, V]} ->
-                          {K, V};
+                          {trimre(K), trimre(V)};
                       nomatch ->
                           []
                   end
           end,
     lists:flatten(lists:map(Fun, Lines)).
+
+
+trimre(Bin) ->
+    re:replace(Bin, "^\\s+|\\s+$", "", [{return, binary}, global]).
 
 
 bind_patterns() ->
