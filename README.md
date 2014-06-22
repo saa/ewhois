@@ -19,6 +19,11 @@ Opts = [Option]
 
 Option = {nic, "whois.example.com"} | raw | vals | {timeout, 5000} | {port, 43}
 
+TODO
+----
+1. Collect many values in bind, example - nameservers.
+2. Add tests
+
 Examples
 --------
 
