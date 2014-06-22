@@ -58,5 +58,5 @@ bind_patterns() ->
                   <<"Registered through">>, <<"Registrar Name[.]*">>, <<"Record maintained by">>,
                   <<"Registration Service Provided By">>, <<"Registar of Record">>, <<"Domain Registar">>]},
      {whois_server, [<<"Whois Server">>]},
-     {nameservers, [<<"nserver">>]}
+     {nameservers, [<<"nserver">>, <<"Nameservers">>, <<"Name Server">>, <<"nameserver">>, <<"Hostname">>, <<"Nserver">>]}
     ].
