@@ -5,19 +5,18 @@
 API
 ---
 
-1)
 ```erlang
 ewhois:query(Domain)
 ```
 
 Domain is binary. Example, <<"github.com">>.
 
-2)
 ```erlang
 ewhois:query(Domain, Opts)
 ```
 
 Opts = [Option]
+
 Option = {nic, "whois.example.com"} | raw | vals | {timeout, 5000} | {port, 43}
 
 Examples
