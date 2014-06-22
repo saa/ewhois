@@ -21,8 +21,10 @@ Option = {nic, "whois.example.com"} | raw | vals | {timeout, 5000} | {port, 43}
 
 TODO
 ----
-1. Collect many values in bind, example - nameservers.
-2. Add tests
+1. Parse date to erlang terms
+2. Collect many values in bind, example - nameservers.
+3. Add support for ipv4/ipv6 whois query
+4. Add tests
 
 Examples
 --------
