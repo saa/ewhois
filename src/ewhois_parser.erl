@@ -22,7 +22,7 @@ bind(Data, [{K, Patterns} | Tail], Acc) ->
 match_value(_Data, []) ->
     undefined;
 match_value(Data, [Pattern | Tail]) ->
-    case re:run(Data, iolist_to_binary([Pattern, <<":\s+(.*)\n">>]), [{capture, [1], binary}]) of
+    case re:run(Data, iolist_to_binary([Pattern, <<":(.*)">>]), [{capture, [1], binary}]) of
         {match, [Value]} ->
             trimre(Value);
         nomatch ->
@@ -52,8 +52,11 @@ bind_patterns() ->
      {status, [<<"state">>, <<"Status">>]},
      {creation_date, [<<"created">>, <<"Creation Date">>, <<"Creation date">>, <<"Registration Date">>,
                       <<"created-date">>, <<"registered">>, <<"registration">>]},
-     {expiration_date, [<<"paid-till">>]},
-     {registrar, [<<"registrar">>, <<"Registrar">>]},
+     {expiration_date, [<<"paid-till">>, <<"Registry Expiry Date">>, <<"Registrar Registration Expiration Date">>,
+                        <<"Expiration date">>, <<"Expiration Date">>, <<"reg-till">>]},
+     {registrar, [<<"registrar">>, <<"Registrar">>, <<"Sponsoring Registrar Organization">>, <<"Sponsoring Registrar">>,
+                  <<"Registered through">>, <<"Registrar Name[.]*">>, <<"Record maintained by">>,
+                  <<"Registration Service Provided By">>, <<"Registar of Record">>, <<"Domain Registar">>]},
      {whois_server, [<<"Whois Server">>]},
      {nameservers, [<<"nserver">>]}
     ].
