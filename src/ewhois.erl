@@ -32,23 +32,25 @@ response(RawData, _Opts) ->
 send_query(Domain, Nic, Opts) when is_list(Nic) ->
     Port = proplists:get_value(port, Opts, ?PORT),
     Timeout = proplists:get_value(timeout, Opts, ?TIMEOUT),
-    case gen_tcp:connect(Nic, Port, [binary, {packet, 0}, {send_timeout, Timeout}], Timeout) of
+    case gen_tcp:connect(Nic, Port, [binary, {active, false}, {packet, 0}, {send_timeout, Timeout}], Timeout) of
         {ok, Sock} ->
             ok = gen_tcp:send(Sock, iolist_to_binary([Domain, <<"\r\n">>])),
-            Reply = wait_reply(Sock, Timeout),
+            Reply = recv(Sock),
             ok = gen_tcp:close(Sock),
             {ok, Reply};
         {error, Reason} ->
             {error, Reason}
     end.
 
+recv(Sock) ->
+    recv(Sock, []).
 
-wait_reply(Sock, Timeout) ->
-    receive
-        {tcp, Sock, Data} ->
-            Data
-    after Timeout ->
-            {error, timeout}
+recv(Sock, Acc) ->
+    case gen_tcp:recv(Sock, 0) of
+        {ok, Data} ->
+            recv(Sock, [Data | Acc]);
+        {error, closed} ->
+            iolist_to_binary(lists:reverse(Acc))
     end.
 
 
