@@ -2,6 +2,7 @@
 
 -export([query/1]).
 -export([query/2]).
+-export([is_available/1]).
 
 -define(IANAHOST, "whois.iana.org").
 -define(TIMEOUT, 10000).
@@ -18,6 +19,16 @@ query(Domain, Opts) when is_binary(Domain), is_list(Opts) ->
             response(Reply, Opts);
         {error, Reason} ->
             {error, Reason}
+    end.
+
+
+%% TODO: parse for key expression.
+is_available(Domain) ->
+    case query(Domain) of
+        [] ->
+            true;
+        _ ->
+            false
     end.
 
 
