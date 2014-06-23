@@ -25,6 +25,7 @@ TODO
 2. Collect many values in bind, example - nameservers.
 3. Add support for ipv4/ipv6 whois query
 4. Add tests
+5. Fix parsing for EU
 
 Examples
 --------
