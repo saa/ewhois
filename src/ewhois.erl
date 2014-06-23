@@ -12,7 +12,7 @@ query(Domain) ->
     query(Domain, ?OPTS).
 
 query(Domain, Opts) when is_binary(Domain), is_list(Opts) ->
-    Nic = proplists:get_value(nic, Opts, get_root_nics(Domain)),
+    Nic = proplists:get_value(nic, Opts, get_nic(Domain)),
     case send_query(Domain, Nic, Opts) of
         {ok, Reply} ->
             response(Reply, Opts);
@@ -23,10 +23,10 @@ query(Domain, Opts) when is_binary(Domain), is_list(Opts) ->
 
 response(RawData, [raw | _T]) ->
     RawData;
-response(RawData, [vals | _T]) ->
-    ewhois_parser:parse_vals(RawData);
+response(RawData, [bind | _T]) ->
+    ewhois_parser:bind(RawData);
 response(RawData, _Opts) ->
-    ewhois_parser:bind(RawData).
+    ewhois_parser:parse_vals(RawData).
 
 
 send_query(Domain, Nic, Opts) when is_list(Nic) ->
@@ -52,6 +52,25 @@ wait_reply(Sock, Timeout) ->
     end.
 
 
+get_nic(Domain) ->
+    case get_nic(Domain, defined_nics()) of
+        undefined ->
+            get_root_nics(Domain);
+        {ok, Nic} ->
+            Nic
+    end.
+
+get_nic(_Domain, []) ->
+    undefined;
+get_nic(Domain, [{Nic, Re} | Nics]) ->
+    case re:run(Domain, Re) of
+        {match, _} ->
+            {ok, Nic};
+        nomatch ->
+            get_nic(Domain, Nics)
+    end.
+
+
 get_root_nics(Domain) ->
     case send_query(Domain, ?IANAHOST, ?OPTS) of
         {ok, Result} ->
@@ -59,8 +78,14 @@ get_root_nics(Domain) ->
                 {match, [Refer]} ->
                     binary_to_list(Refer);
                 nomatch ->
-                    {error, not_found_root_nics}
+                    ?IANAHOST
             end;
         {error, Reason} ->
             {error, Reason}
     end.
+
+
+defined_nics() ->
+    [
+     {"whois.nic.ru", <<"^(.*)+.(org|net|com|msk|spb|nov|sochi).ru$">>}
+    ].
