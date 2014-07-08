@@ -107,7 +107,8 @@ defined_nics() ->
     [
      {"whois.nic.ru", <<"^(.*)+.(org|net|com|msk|spb|nov|sochi).ru$">>},
      {"whois.nic.fm", <<"^(.*)+fm">>},
-     {"mn.whois-servers.net", <<"^(.*)+mn">>}
+     {"mn.whois-servers.net", <<"^(.*)+mn">>},
+     {"whois.belizenic.bz", <<"^(.*)+bz">>}
     ].
 
 
@@ -123,5 +124,6 @@ free_patterns() ->
      "Status: AVAILABLE",
      "Status:\tAVAILABLE",
      "Status: Not Registered",
-     "NOT FOUND"
+     "NOT FOUND",
+     "Whois Error: No Match for" %% .bz
     ].
