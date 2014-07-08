@@ -1,7 +1,7 @@
 {application, ewhois,
  [
   {description, "Erlang whois client"},
-  {vsn, "0.7.2"},
+  {vsn, "0.7.3"},
   {registered, []},
   {applications, [
                   kernel,

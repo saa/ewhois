@@ -105,7 +105,8 @@ get_root_nics(Domain) ->
 
 defined_nics() ->
     [
-     {"whois.nic.ru", <<"^(.*)+.(org|net|com|msk|spb|nov|sochi).ru$">>}
+     {"whois.nic.ru", <<"^(.*)+.(org|net|com|msk|spb|nov|sochi).ru$">>},
+     {"whois.nic.fm", <<"^(.*)+fm">>}
     ].
 
 
@@ -118,8 +119,8 @@ free_patterns() ->
      "No match",
      "not found in database",
      "Nothing found for this query",
-     "Status:  AVAILABLE",
      "Status: AVAILABLE",
+     "Status:\tAVAILABLE",
      "Status: Not Registered",
      "NOT FOUND"
     ].
