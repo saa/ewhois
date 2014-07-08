@@ -106,7 +106,8 @@ get_root_nics(Domain) ->
 defined_nics() ->
     [
      {"whois.nic.ru", <<"^(.*)+.(org|net|com|msk|spb|nov|sochi).ru$">>},
-     {"whois.nic.fm", <<"^(.*)+fm">>}
+     {"whois.nic.fm", <<"^(.*)+fm">>},
+     {"mn.whois-servers.net", <<"^(.*)+mn">>}
     ].
 
 
