@@ -5,7 +5,7 @@
 -export([is_available/1]).
 
 -define(IANAHOST, "whois.iana.org").
--define(TIMEOUT, 10000).
+-define(TIMEOUT, 15000).
 -define(PORT, 43).
 -define(OPTS, [{port, ?PORT}, {timeout, ?TIMEOUT}]).
 
@@ -110,11 +110,16 @@ defined_nics() ->
 
 
 free_patterns() ->
-    ["No entries found for the selected",
+    [
+     "No entries found for the selected",
      "No match for",
      "NOT FOUND",
      "Not found:",
      "No match",
      "not found in database",
      "Nothing found for this query",
-     "Status:  AVAILABLE"].
+     "Status:  AVAILABLE",
+     "Status: AVAILABLE",
+     "Status: Not Registered",
+     "NOT FOUND"
+    ].
