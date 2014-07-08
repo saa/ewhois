@@ -22,14 +22,19 @@ query(Domain, Opts) when is_binary(Domain), is_list(Opts) ->
     end.
 
 
-%% TODO: parse for key expression.
 is_available(Domain) ->
-    case query(Domain) of
-        [] ->
-            true;
-        _ ->
-            false
-    end.
+    RawData = query(Domain, [raw]),
+    Patterns = free_patterns(),
+    CheckFun = fun(Pattern) ->
+                       case re:run(RawData, Pattern, [{capture, none}]) of
+                           match ->
+                               true;
+                           nomatch ->
+                               false
+                       end
+               end,
+    Result = lists:map(CheckFun, Patterns),
+    lists:member(true, Result).
 
 
 response(RawData, [raw | _T]) ->
@@ -102,3 +107,14 @@ defined_nics() ->
     [
      {"whois.nic.ru", <<"^(.*)+.(org|net|com|msk|spb|nov|sochi).ru$">>}
     ].
+
+
+free_patterns() ->
+    ["No entries found for the selected",
+     "No match for",
+     "NOT FOUND",
+     "Not found:",
+     "No match",
+     "not found in database",
+     "Nothing found for this query",
+     "Status:  AVAILABLE"].
