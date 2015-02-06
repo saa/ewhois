@@ -9,15 +9,30 @@ API
 ewhois:query(Domain)
 ```
 
-Domain is binary. Example, <<"github.com">>.
-
 ```erlang
 ewhois:query(Domain, Opts)
 ```
 
-Opts = [Option]
+Domain :: binary()
+Opts   :: options()
 
-Option = {nic, "whois.example.com"} | raw | vals | {timeout, 5000} | {port, 43}
+Types
+_____
+
+```erlang
+-type options() :: [bind
+                    | raw
+                    | vals
+                    | {nic, string()}
+                    | {timeout, timeout()}
+                    | {port, non_neg_integer()}
+                   ].
+
+-type bind() :: [{atom, binary()}].
+-type vals() :: [{binary(), binary()}].
+-type raw() :: binary().
+-type result() :: bind() | vals() | raw().
+```
 
 TODO
 ----
@@ -30,58 +45,66 @@ TODO
 Examples
 --------
 
-Bind data:
+Split key/value data:
 
 ```erlang
-1> ewhois:query(<<"github.com">>).
-[{nameservers,<<"NS1.P16.DYNECT.NET">>},
- {whois_server,<<"whois.markmonitor.com">>},
- {registrar,<<"MARKMONITOR INC.">>},
- {expiration_date,<<"09-oct-2020">>},
- {creation_date,<<"09-oct-2007">>},
- {status,<<"clientDeleteProhibited">>}]
+1>  ewhois:query(<<"google.com">>).
+{ok,[{<<"Domain Name">>,<<"google.com">>},
+     {<<"Registry Domain ID">>,<<"2138514_DOMAIN_COM-VRSN">>},
+     {<<"Registrar WHOIS Server">>,<<"whois.markmonitor.com">>},
+     {<<"Registrar URL">>,<<"http://www.markmonitor.com">>},
+     {<<"Updated Date">>,<<"2014-10-28T12:38:28-0700">>},
+     {<<"Creation Date">>,<<"1997-09-15T00:00:00-0700">>},
+     {<<"Registrar Registration Expiration Date">>,
+      <<"2020-09-13T21:00:00-0700">>},
+     {<<"Registrar">>,<<"MarkMonitor, Inc.">>},
+     {<<"Registrar IANA ID">>,<<"292">>},
+     {<<"Registrar Abuse Contact Email">>,
+      <<"abusecomplaints@markmonitor.com">>},
+     {<<"Registrar Abuse Contact Phone">>,<<"+1.2083895740">>},
+     {<<"Domain Status">>,
+      <<"clientUpdateProhibited (https://www.icann.org/epp#cl"...>>},
+     {<<"Domain Status">>,
+      <<"clientTransferProhibited (https://www.icann.org/"...>>},
+     {<<"Domain Status">>,
+      <<"clientDeleteProhibited (https://www.icann.or"...>>},
+     {<<"Registry Registrant ID">>,<<>>},
+     {<<"Registrant Name">>,<<"Dns Admin">>},
+     {<<"Registrant Organization">>,<<"Google Inc.">>},
+     {<<"Registrant Street">>,
+      <<"Please contact contact-admin"...>>},
+     {<<"Registrant City">>,<<"Mountain View">>},
+     {<<"Registrant State/Provinc"...>>,<<"CA">>},
+     {<<"Registrant Postal Co"...>>,<<"94043">>},
+     {<<"Registrant Count"...>>,<<"US">>},
+     {<<"Registrant P"...>>,<<"+1.65025"...>>},
+     {<<"Registra"...>>,<<>>},
+     {<<"Regi"...>>,<<...>>},
+     {<<...>>,...},
+     {...}|...]}
 ```
 
 Raw data:
 
 ```erlang
-1> ewhois:query(<<"github.com">>, [raw]).
-<<"\nWhois Server Version 2.0\n\nDomain names in the .com and .net domains can now be registered\nwith many different compe"...>>
+1> ewhois:query(<<"google.com">>, [raw]).
+{ok,<<"\n\nDomain Name: google.com\nRegistry Domain ID: 2138514_DOMAIN_COM-VRSN\nRegistrar WHOIS Server: whois.markmoni"...>>}
 ```
 
-Split key - values data:
+Bind
 
 ```erlang
-1> ewhois:query(<<"github.com">>, [vals]).
-[{<<"Domain Name">>,<<"GITHUB.COM">>},
- {<<"Registrar">>,<<"MARKMONITOR INC.">>},
- {<<"Whois Server">>,<<"whois.markmonitor.com">>},
- {<<"Referral URL">>,<<"http://www.markmonitor.com">>},
- {<<"Name Server">>,<<"NS1.P16.DYNECT.NET">>},
- {<<"Name Server">>,<<"NS2.P16.DYNECT.NET">>},
- {<<"Name Server">>,<<"NS3.P16.DYNECT.NET">>},
- {<<"Name Server">>,<<"NS4.P16.DYNECT.NET">>},
- {<<"Status">>,<<"clientDeleteProhibited">>},
- {<<"Status">>,<<"clientTransferProhibited">>},
- {<<"Status">>,<<"clientUpdateProhibited">>},
- {<<"Updated Date">>,<<"14-jun-2013">>},
- {<<"Creation Date">>,<<"09-oct-2007">>},
- {<<"Expiration Date">>,<<"09-oct-2020">>},
- {<<">>> Last update of whois database">>,
-  <<"Sun, 22 Jun 2014 08:58:19 UTC <<<">>},
- {<<"NOTICE">>,
-  <<"The expiration date displayed in this record"...>>},
- {<<"TERMS OF USE">>,
- <<"You are not authorized to access or quer"...>>}]
+1> ewhois:query(<<"google.com">>, [bind]).
+{ok,[{nameservers,<<"ns4.google.com">>},
+     {registrar,<<"MarkMonitor, Inc.">>},
+     {expiration_date,<<"2020-09-13T21:00:00-0700">>},
+     {creation_date,<<"1997-09-15T00:00:00-0700">>},
+     {status,<<"clientUpdateProhibited (https://www.icann.org/epp#clientUpdateProhibited)">>}]}
 ```
 
 Set whois server:
 
 ```erlang
-1> ewhois:query(<<"google.ru">>, [{nic, "whois.r01.ru"}]).
-[{nameservers,<<"ns1.google.com.">>},
- {registrar,<<"RU-CENTER-REG-RIPN">>},
- {expiration_date,<<"2015.03.05">>},
- {creation_date,<<"2004.03.04">>},
- {status,<<"REGISTERED, DELEGATED, VERIFIED">>}]
+1> ewhois:query(<<"google.com">>, [{nic, "whois.r01.ru"}]).
+{ok,[]}
 ```

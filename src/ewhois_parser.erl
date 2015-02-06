@@ -3,10 +3,17 @@
 -export([bind/1]).
 -export([parse_vals/1]).
 
+-type bind_patterns() :: [{atom, [binary()]}].
 
+%%%===================================================================
+%%% API
+%%%===================================================================
+
+-spec bind(ewhois:raw()) -> ewhois:bind().
 bind(Data) ->
     bind(Data, bind_patterns(), []).
 
+-spec bind(ewhois:raw(), bind_patterns(), list()) -> ewhois:bind().
 bind(_Data, [], Acc) ->
     Acc;
 bind(Data, [{K, Patterns} | Tail], Acc) ->
@@ -18,18 +25,7 @@ bind(Data, [{K, Patterns} | Tail], Acc) ->
            end,
     bind(Data, Tail, Acc2).
 
-
-match_value(_Data, []) ->
-    undefined;
-match_value(Data, [Pattern | Tail]) ->
-    case re:run(Data, iolist_to_binary([Pattern, <<":(.*)">>]), [{capture, [1], binary}]) of
-        {match, [Value]} ->
-            trimre(Value);
-        nomatch ->
-            match_value(Data, Tail)
-    end.
-
-
+-spec parse_vals(ewhois:raw()) -> ewhois:vals().
 parse_vals(Data) ->
     Lines = binary:split(Data, <<"\n">>, [global]),
     Fun = fun(Line) ->
@@ -42,11 +38,26 @@ parse_vals(Data) ->
           end,
     lists:flatten(lists:map(Fun, Lines)).
 
+%%%===================================================================
+%%% Internal functions
+%%%===================================================================
 
+-spec match_value(ewhois:raw(), [binary()]) -> undefined | binary().
+match_value(_Data, []) ->
+    undefined;
+match_value(Data, [Pattern | Tail]) ->
+    case re:run(Data, iolist_to_binary([Pattern, <<":(.*)">>]), [{capture, [1], binary}]) of
+        {match, [Value]} ->
+            trimre(Value);
+        nomatch ->
+            match_value(Data, Tail)
+    end.
+
+-spec trimre(binary()) -> binary().
 trimre(Bin) ->
     re:replace(Bin, "^\\s+|\\s+$", "", [{return, binary}, global]).
 
-
+-spec bind_patterns() -> bind_patterns().
 bind_patterns() ->
     [
      {status, [<<"state">>, <<"Status">>]},
