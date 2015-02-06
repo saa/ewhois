@@ -14,10 +14,11 @@ ewhois:query(Domain, Opts)
 ```
 
 Domain :: binary()
+
 Opts   :: options()
 
 Types
-_____
+-----
 
 ```erlang
 -type options() :: [bind
